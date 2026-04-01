@@ -161,6 +161,153 @@ sudo chown john:developers project.txt
 
 ---
 
+# LVM (Logical Volume Manager) in Linux
+
+Logical Volume Manager (LVM) is a storage management system used in Linux that provides flexible disk management. It allows administrators to combine multiple disks, resize storage, and manage volumes efficiently compared to traditional disk partitioning.
+
+---
+
+## LVM Architecture
+
+LVM works with three main components:
+
+Physical Disk → Physical Volume (PV) → Volume Group (VG) → Logical Volume (LV) → File System
+
+Example:
+
+/dev/sdb → PV → VG (vg_data) → LV (lv_data) → Mounted to /data
+
+---
+
+## 1. Physical Volume (PV)
+
+A Physical Volume is a disk or partition used by LVM.
+
+Create a Physical Volume:
+
+pvcreate /dev/sdb
+
+Display Physical Volume information:
+
+pvdisplay
+
+---
+
+## 2. Volume Group (VG)
+
+A Volume Group is created by combining one or more Physical Volumes. It acts as a storage pool.
+
+Create a Volume Group:
+
+vgcreate vg_data /dev/sdb
+
+Display Volume Group details:
+
+vgdisplay
+
+Extend Volume Group by adding another disk:
+
+vgextend vg_data /dev/sdc
+
+---
+
+## 3. Logical Volume (LV)
+
+Logical Volumes are created from the free space in a Volume Group and behave like normal disk partitions.
+
+Create a Logical Volume:
+
+lvcreate -L 5G -n lv_data vg_data
+
+Display Logical Volume information:
+
+lvdisplay
+
+---
+
+## Create File System
+
+Format the Logical Volume:
+
+mkfs.ext4 /dev/vg_data/lv_data
+
+---
+
+## Mount Logical Volume
+
+Create a directory:
+
+mkdir /data
+
+Mount the logical volume:
+
+mount /dev/vg_data/lv_data /data
+
+Check disk usage:
+
+df -h
+
+---
+
+## Extend Logical Volume
+
+Increase the Logical Volume size:
+
+lvextend -L +2G /dev/vg_data/lv_data
+
+Resize the filesystem:
+
+resize2fs /dev/vg_data/lv_data
+
+---
+
+## Reduce Logical Volume
+
+First reduce the filesystem:
+
+resize2fs /dev/vg_data/lv_data 3G
+
+Then reduce the logical volume:
+
+lvreduce -L 3G /dev/vg_data/lv_data
+
+Note: Always reduce the filesystem before reducing the logical volume to avoid data loss.
+
+---
+
+## LVM Snapshot
+
+Create snapshot:
+
+lvcreate -L 1G -s -n lv_snapshot /dev/vg_data/lv_data
+
+Snapshots are useful for backups and testing.
+
+---
+
+## Important LVM Commands
+
+pvcreate – Create Physical Volume  
+pvdisplay – Display Physical Volume details  
+vgcreate – Create Volume Group  
+vgdisplay – Display Volume Group details  
+lvcreate – Create Logical Volume  
+lvdisplay – Display Logical Volume details  
+lvextend – Extend Logical Volume  
+lvreduce – Reduce Logical Volume  
+
+---
+
+## Advantages of LVM
+
+- Flexible storage management
+- Easy disk resizing
+- Combine multiple disks
+- Snapshot support
+- Efficient disk utilization
+
+---
+
 ## Conclusion
 
-Understanding SSH, package management, user management, and file permissions is important for Linux system administration. These tools help administrators manage systems, control user access, and maintain security.
+Understanding SSH, package management, user management, file permissions and LVM management is important for Linux system administration. These tools help administrators manage systems, control user access, and maintain security.
